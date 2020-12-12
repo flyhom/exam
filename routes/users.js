@@ -52,7 +52,7 @@ router.post('/register', asyncHandler(async(req, res, next) => {
         if (queryResult.length != 1) {
             password = sha256(password).toString();
             db(`Insert into users ( name, email, password, birthday, phone ) Values ( ?, ?, ?, ?, ? )`, [name, email, password, birthday, phone]);
-            return res.json({ status: 1, message: '註冊成功，請重新登入', isLogin: true });
+            return res.json({ status: 1, message: '註冊成功，請重新登入' });
         } else {
             return res.json({ status: 0, message: '此用戶已註冊過' });
         }
