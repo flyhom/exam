@@ -52,7 +52,7 @@ router.post('/add', asyncHandler(async(req, res, next) => {
     }
 }));
 
-router.post('/getChangeProductSort', asyncHandler(async(req, res, next) => {
+router.post('/getChange', asyncHandler(async(req, res, next) => {
     let { token, sId } = req.body;
     if (token) {
         let queryCheck = await db(`Select * from users Where login_token = '${token}' and admin = 1`);
@@ -70,6 +70,28 @@ router.post('/getChangeProductSort', asyncHandler(async(req, res, next) => {
             return res.json({ status: 0, message: '目前沒有商品分類，請新增分類' });
         } else {
             return res.json({ status: 1, message: '資料獲取成功', productSorts: queryResult });
+        }
+    } catch (err) {
+        next(err);
+    }
+}));
+
+router.post('/update', asyncHandler(async(req, res, next) => {
+    let { token, sId, name } = req.body;
+    if (token) {
+        let queryCheck = await db(`Select * from users Where login_token = '${token}' and admin = 1`);
+        if (queryCheck.length < 1) {
+            return res.json({ status: 0, message: '您沒有使用此功能的權限' });
+        }
+    } else {
+        return res.json({ status: 0, message: '登入已逾時，請重新登入' });
+    }
+    try {
+        if (name) {
+            await db(`Update product_sort set name = ? where id = ?`, [name, sId]);
+            return res.json({ status: 1, message: '商品列表更新成功' });
+        } else {
+            return res.json({ status: 0, message: '列表名稱未輸入' });
         }
     } catch (err) {
         next(err);
