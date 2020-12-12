@@ -26,7 +26,7 @@ router.post('/login', asyncHandler(async(req, res, next) => {
             token = sha256(Date.now() + queryResult[0].id).toString();
             let admin = queryResult[0].admin;
             await db(`UPDATE users set login_token = ? where id = ?`, [token, queryResult[0].id]);
-            return res.json({ status: 1, message: '登入成功', isLogin: true, admin: admin, tokens: token });
+            return res.json({ status: 1, message: '登入成功', admin: admin, token: token });
         } else {
             return res.json({ status: 0, message: '密碼錯誤' });
         }
