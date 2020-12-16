@@ -17,7 +17,7 @@ router.post('/', asyncHandler(async(req, res, next) => {
         return res.json({ status: 0, message: '登入已逾時，請重新登入' });
     }
     try {
-        let queryResult = await db(`Select * from product_sort`);
+        let queryResult = await db(`Select * from product_sort where status = 0`);
         console.log(queryResult);
         console.log(queryResult.length);
         if (queryResult.length < 1) {
