@@ -31,7 +31,19 @@ router.post('/', asyncHandler(async(req, res, next) => {
     }
 }));
 
+router.get('/getSort', asyncHandler(async(req, res, next) => {
+    try {
+        let queryProductSort = await db(`Select id, name from product_sort where status = 1`);
+        if (queryProductSort.length < 1) {
+            return res.json({ status: 0, message: '找不到商品列表' });
+        } else {
 
+            return res.json({ status: 1, message: '資料獲取成功', sort: queryProductSort });
+        }
+    } catch (err) {
+        next(err);
+    }
+}));
 
 router.post('/add', asyncHandler(async(req, res, next) => {
     // let { token, name, sortId, price, stock } = req.body;
@@ -168,7 +180,7 @@ router.post('/changeProductData', asyncHandler(async(req, res, next) => {
     }
     try {
         let queryProduct = await db(`Select * from products where id = ?`, [pId]);
-        let queryProductSort = await db(`Select * from product_sort`);
+        let queryProductSort = await db(`Select id, name from product_sort where status = 1`);
         let queryProductPreviewPics = await db(`Select * from product_preview_pics where pid = ?`, [pId]);
         if (queryProduct.length < 1) {
             return res.json({ status: 0, message: '找不到該商品' });
@@ -279,13 +291,12 @@ router.post('/previewPicDelete', asyncHandler(async(req, res, next) => {
         if (queryProductPreviewPics.length < 1) {
             return res.json({ status: 0, message: '預覽圖刪除失敗' });
         } else {
-
             let src = queryProductPreviewPics[0].src;
             let filename = queryProductPreviewPics[0].filename;
             fs.unlinkSync(default_path + src + filename);
             await db(`Delete from product_preview_pics where id = ?`, [picId]);
             // console.log(default_path + src + filename);
-            return res.json({ status: 1, message: '預覽圖刪除成功', queryProductPreviewPics: queryProductPreviewPics });
+            return res.json({ status: 1, message: '預覽圖刪除成功' });
         }
 
 
@@ -294,5 +305,23 @@ router.post('/previewPicDelete', asyncHandler(async(req, res, next) => {
     }
 }));
 
+router.post('/delete', asyncHandler(async(req, res, next) => {
+    let { token, pId } = req.body;
+    if (token) {
+        let queryCheck = await db(`Select * from users Where login_token = '${token}' and admin = 1`);
+        if (queryCheck.length < 1) {
+            return res.json({ status: 0, message: '您沒有使用此功能的權限' });
+        }
+    } else {
+        return res.json({ status: 0, message: '登入已逾時，請重新登入' });
+    }
+    try {
+        await db(`Delete from product_preview_pics where pid = ?`, [pId]);
+        await db(`Delete from products where id = ?`, [pId]);
+        return res.json({ status: 1, message: '刪除商品成功' });
+    } catch (err) {
+        next(err);
+    }
+}));
 
 module.exports = router;
