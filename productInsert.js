@@ -37,7 +37,7 @@ price = [12000, 15000, 16900, 22000, 24000, 27800, 29900, 31900, 34000, 36000, 3
 stock = getRandomInt(10);
 let jsonData;
 let arr = new Array();
-let summary;
+let summary, specification;
 
 let previewPath;
 let previewPathSave;
@@ -70,8 +70,9 @@ fs.readdir(defaultFolder + "/", asyncHandler(async(err, files) => {
                 } else if (type == 1) {
                     summary = JSON.stringify(jsonData.summary);
                 }
+                specification = JSON.stringify(jsonData.specification);
                 name = jsonData.title;
-                await db(`Insert into products ( sortId, name, price, stock, summary ) Values ( ?, ?, ?, ?, ? )`, [sortId, name, price[getRandomInt(21)], getRandomInt(10), summary]);
+                await db(`Insert into products ( sortId, name, price, stock, summary, specification ) Values ( ?, ?, ?, ?, ?, ? )`, [sortId, name, price[getRandomInt(21)], getRandomInt(10), summary, specification]);
                 let queryProduct = await db(`Select * from products Where name like '%${name}%'`);
                 if (queryProduct.length >= 1) {
                     pId = queryProduct[0].id;
@@ -92,7 +93,7 @@ fs.readdir(defaultFolder + "/", asyncHandler(async(err, files) => {
                     fs.copyFile(defaultFolder + "/" + files[i] + '/' + jsonData.images[z], previewPath + jsonData.images[z], (err) => {
                         if (err) throw err;
                     });
-                    await db(`Insert into product_preview_pics ( pid, src, filename ) Values ( ?, ?, ? )`, [pId, previewPathSave, jsonData.images[z]]);
+                    await db(`Insert into product_preview_pics ( pid, sequence, src, filename ) Values ( ?, ?, ?, ? )`, [pId, z, previewPathSave, jsonData.images[z]]);
                 }
                 // break;
             } else if (filenew[j].includes('png')) {
