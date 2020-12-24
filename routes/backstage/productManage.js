@@ -26,10 +26,12 @@ router.post('/', asyncHandler(async(req, res, next) => {
     }
     try {
         let queryResult = await db(`Select p.id as 'pId', ps.name as 'sort_name', p.name, p.price, p.stock, p.summary, p.specification from products as p, product_sort as ps where p.sortId = ps.id limit ?,10`, [page]);
+        let queryResult2 = await db(`Select count(*) as 'productCount' from products`);
         if (queryResult.length < 1) {
             return res.json({ status: 0, message: '目前沒有商品，請新增商品' });
         } else {
-            return res.json({ status: 1, message: '資料獲取成功', products: queryResult });
+            maxPageNum = Math.ceil(queryResult2[0].productCount / 10);
+            return res.json({ status: 1, message: '資料獲取成功', maxPageNum: maxPageNum, products: queryResult });
         }
     } catch (err) {
         next(err);

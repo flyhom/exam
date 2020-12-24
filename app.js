@@ -11,6 +11,7 @@ const expressSession = require('express-session');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const productsRouter = require('./routes/products');
+const cartRouter = require('./routes/cart');
 const back_productsortRouter = require('./routes/backstage/productSort');
 const back_productManageRouter = require('./routes/backstage/productManage');
 
@@ -41,6 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
+app.use('/cart', cartRouter);
 app.use('/back/productSort', back_productsortRouter);
 app.use('/back/productManage', back_productManageRouter);
 
