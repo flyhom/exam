@@ -48,7 +48,7 @@ router.post('/buy', asyncHandler(async(req, res, next) => {
     if (token) {
         let queryCheck = await db(`Select * from users Where login_token = '${token}'`);
         if (queryCheck.length < 1) {
-            return res.json({ status: 0, message: '請登入後再進行購買' });
+            return res.json({ status: 0, message: '請重新登入再進行購買' });
         } else {
             uId = queryCheck[0].id;
         }
@@ -56,19 +56,8 @@ router.post('/buy', asyncHandler(async(req, res, next) => {
         return res.json({ status: 0, message: '登入已逾時，請重新登入' });
     }
     try {
-        await db(`Insert into orders ( uId, pId, num, price, payment_method, send_method, address, create_time ) Values ( ?, ?, ?, ?, ?, ?, ?, ? )`, [uId, pId, buyNum, price, payment_method, send_method, address, now]);
-        let queryResult = await db(`Select id as 'pId', name, price from products where id = ?`, [pId]);
-        if (queryResult.length < 1) {
-            return res.json({ status: 0, message: '獲取商品錯誤，請重新整理再購買一次' });
-        } else {
-            let price = queryResult[0].price;
-            if (price > 30000) {
-                shipping = 0;
-            } else {
-                shipping = 100;
-            }
-            return res.json({ status: 1, message: '資料獲取成功', product: queryResult, shipping: shipping });
-        }
+        await db(`Insert into orders ( uId, pId, num, price, shipping, payment_method, send_method, address, create_time ) Values ( ?, ?, ?, ?, ?, ?, ?, ? )`, [uId, pId, buyNum, price, shipping, payment_method, send_method, address, now]);
+        return res.json({ status: 1, message: '訂單建立成功' });
     } catch (err) {
         next(err);
     }

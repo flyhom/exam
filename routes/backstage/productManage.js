@@ -65,7 +65,7 @@ router.post('/add', asyncHandler(async(req, res, next) => {
             }
             let { token, name, sortId, price, stock } = fields;
             let { summary, specification } = fields;
-            let { previewPhoto1, previewPhoto2, previewPhoto3 } = files;
+            // let { previewPhoto1, previewPhoto2, previewPhoto3 } = files;
             //驗證使用者權限
             if (token) {
                 let queryCheck = await db(`Select * from users Where login_token = '${token}' and admin = 1`);
@@ -100,41 +100,41 @@ router.post('/add', asyncHandler(async(req, res, next) => {
                 await db(`Update products set specification = ? where id = ?`, [specification, pId]);
             }
             //預覽圖新增到資料庫
-            let timmer = 0;
-            let tempPhoto;
-            let previewPath = default_path + '/images/products/' + pId + "/preview/";
-            let previewPathSave = '/images/products/' + pId + "/preview/";
-            //建立資料夾
-            fs.mkdirSync(previewPath, { recursive: true }, (err) => {
-                if (err) throw err;
-            });
-            do {
-                if (timmer == 0) {
-                    tempPhoto = previewPhoto1;
-                } else if (timmer == 1) {
-                    tempPhoto = previewPhoto2;
-                } else {
-                    tempPhoto = previewPhoto3;
-                    // console.log(previewPhoto3);
-                }
-                if (tempPhoto) {
-                    console.log(tempPhoto.size);
-                    console.log(previewPath);
-                    console.log(tempPhoto.path);
-                    if (tempPhoto.size != 0) {
-                        fs.renameSync(tempPhoto.path, previewPath + tempPhoto.name);
-                        await db(`Insert into product_preview_pics ( pid, src, filename ) Values ( ?, ?, ? )`, [pId, previewPathSave, tempPhoto.name]);
-                    } else {
-                        console.log(timmer + ' is not 存在 too');
-                    }
-                } else {
-                    //檔案沒上傳
-                    // break;
-                    console.log(timmer + ' is not 存在');
-                }
-                // previewPath = default_path + '/images/';
-                timmer = timmer + 1;
-            } while (timmer < 3);
+            // let timmer = 0;
+            // let tempPhoto;
+            // let previewPath = default_path + '/images/products/' + pId + "/preview/";
+            // let previewPathSave = '/images/products/' + pId + "/preview/";
+            // //建立資料夾
+            // fs.mkdirSync(previewPath, { recursive: true }, (err) => {
+            //     if (err) throw err;
+            // });
+            // do {
+            //     if (timmer == 0) {
+            //         tempPhoto = previewPhoto1;
+            //     } else if (timmer == 1) {
+            //         tempPhoto = previewPhoto2;
+            //     } else {
+            //         tempPhoto = previewPhoto3;
+            //         // console.log(previewPhoto3);
+            //     }
+            //     if (tempPhoto) {
+            //         console.log(tempPhoto.size);
+            //         console.log(previewPath);
+            //         console.log(tempPhoto.path);
+            //         if (tempPhoto.size != 0) {
+            //             fs.renameSync(tempPhoto.path, previewPath + tempPhoto.name);
+            //             await db(`Insert into product_preview_pics ( pid, src, filename ) Values ( ?, ?, ? )`, [pId, previewPathSave, tempPhoto.name]);
+            //         } else {
+            //             console.log(timmer + ' is not 存在 too');
+            //         }
+            //     } else {
+            //         //檔案沒上傳
+            //         // break;
+            //         console.log(timmer + ' is not 存在');
+            //     }
+            //     // previewPath = default_path + '/images/';
+            //     timmer = timmer + 1;
+            // } while (timmer < 3);
 
             //商品介紹圖片新增到資料庫
             // let descriptionPath = default_path + "/images/products/" + pId + "/description/";
@@ -170,7 +170,7 @@ router.post('/add', asyncHandler(async(req, res, next) => {
             //     timmer2 = timmer2 + 1;
             // } while (timmer2 < 3);
             //完成
-            return res.json({ status: 1, message: '商品新增成功' });
+            return res.json({ status: 1, message: '商品新增成功', pId: pId });
             // return res.redirect(303, '/thankyou');
         }));
 
@@ -193,7 +193,7 @@ router.post('/changeProductData', asyncHandler(async(req, res, next) => {
     try {
         let queryProduct = await db(`Select * from products where id = ?`, [pId]);
         let queryProductSort = await db(`Select id, name from product_sort where status = 1`);
-        let queryProductPreviewPics = await db(`Select * from product_preview_pics where pid = ?`, [pId]);
+        let queryProductPreviewPics = await db(`Select * from product_preview_pics where pid = ? order by sequence asc`, [pId]);
         if (queryProduct.length < 1) {
             return res.json({ status: 0, message: '找不到該商品' });
         } else {
@@ -246,7 +246,74 @@ router.post('/modify', asyncHandler(async(req, res, next) => {
                 await db(`Update products set specification = ? where id = ?`, [specification, pId]);
             }
             //預覽圖新增到資料庫
-            let timmer = 0;
+            // let timmer = 0;
+            // let tempPhoto;
+            // let previewPath = default_path + '/images/products/' + pId + "/preview/";
+            // let previewPathSave = '/images/products/' + pId + "/preview/";
+            // //建立資料夾
+            // fs.mkdirSync(previewPath, { recursive: true }, (err) => {
+            //     if (err) throw err;
+            // });
+            // do {
+            //     if (timmer == 0) {
+            //         tempPhoto = previewPhoto1;
+            //     } else if (timmer == 1) {
+            //         tempPhoto = previewPhoto2;
+            //     } else {
+            //         tempPhoto = previewPhoto3;
+            //         // console.log(previewPhoto3);
+            //     }
+            //     if (tempPhoto) {
+            //         console.log(tempPhoto.size);
+            //         console.log(previewPath);
+            //         console.log(tempPhoto.path);
+            //         if (tempPhoto.size != 0) {
+            //             fs.renameSync(tempPhoto.path, previewPath + tempPhoto.name);
+            //             await db(`Insert into product_preview_pics ( pid, src, filename ) Values ( ?, ?, ? )`, [pId, previewPathSave, tempPhoto.name]);
+            //         } else {
+            //             console.log(timmer + ' is not 存在 too');
+            //         }
+            //     } else {
+            //         //檔案沒上傳
+            //         // break;
+            //         console.log(timmer + ' is not 存在');
+            //     }
+            //     // previewPath = default_path + '/images/';
+            //     timmer = timmer + 1;
+            // } while (timmer < 3);
+            //完成
+            return res.json({ status: 1, message: '商品資料更新成功' });
+            // return res.redirect(303, '/thankyou');
+        }));
+
+
+    } catch (err) {
+        next(err);
+    }
+}));
+
+router.post('/uploadImage', asyncHandler(async(req, res, next) => {
+    let form = new formidable.IncomingForm();
+    try {
+        form.parse(req, asyncHandler(async(err, fields, files) => {
+            let default_path = process.cwd() + '/public';
+            // let default_path = '../../public';
+            if (err) {
+                //   return res.redirect(303, '/error');
+                next(err);
+            }
+            let { token, pId, sequence } = fields;
+            let { previewPhoto } = files;
+            //驗證使用者權限
+            if (token) {
+                let queryCheck = await db(`Select * from users Where login_token = '${token}' and admin = 1`);
+                if (queryCheck.length < 1) {
+                    return res.json({ status: 0, message: '您沒有使用此功能的權限' });
+                }
+            } else {
+                return res.json({ status: 0, message: '登入已逾時，請重新登入' });
+            }
+            //預覽圖新增到資料庫
             let tempPhoto;
             let previewPath = default_path + '/images/products/' + pId + "/preview/";
             let previewPathSave = '/images/products/' + pId + "/preview/";
@@ -254,33 +321,24 @@ router.post('/modify', asyncHandler(async(req, res, next) => {
             fs.mkdirSync(previewPath, { recursive: true }, (err) => {
                 if (err) throw err;
             });
-            do {
-                if (timmer == 0) {
-                    tempPhoto = previewPhoto1;
-                } else if (timmer == 1) {
-                    tempPhoto = previewPhoto2;
+            tempPhoto = previewPhoto;
+
+            if (tempPhoto) {
+                console.log(tempPhoto.size);
+                console.log(previewPath);
+                console.log(tempPhoto.path);
+                if (tempPhoto.size != 0) {
+                    fs.renameSync(tempPhoto.path, previewPath + tempPhoto.name);
+                    await db(`Insert into product_preview_pics ( pid, sequence, src, filename ) Values ( ?, ?, ?, ? )`, [pId, sequence, previewPathSave, tempPhoto.name]);
                 } else {
-                    tempPhoto = previewPhoto3;
-                    // console.log(previewPhoto3);
+                    console.log(timmer + ' is not 存在 too');
                 }
-                if (tempPhoto) {
-                    console.log(tempPhoto.size);
-                    console.log(previewPath);
-                    console.log(tempPhoto.path);
-                    if (tempPhoto.size != 0) {
-                        fs.renameSync(tempPhoto.path, previewPath + tempPhoto.name);
-                        await db(`Insert into product_preview_pics ( pid, src, filename ) Values ( ?, ?, ? )`, [pId, previewPathSave, tempPhoto.name]);
-                    } else {
-                        console.log(timmer + ' is not 存在 too');
-                    }
-                } else {
-                    //檔案沒上傳
-                    // break;
-                    console.log(timmer + ' is not 存在');
-                }
-                // previewPath = default_path + '/images/';
-                timmer = timmer + 1;
-            } while (timmer < 3);
+            } else {
+                //檔案沒上傳
+                // break;
+                console.log(timmer + ' is not 存在');
+            }
+            // previewPath = default_path + '/images/';
             //完成
             return res.json({ status: 1, message: '商品資料更新成功' });
             // return res.redirect(303, '/thankyou');
