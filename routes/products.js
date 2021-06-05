@@ -3,6 +3,26 @@ const router = express.Router();
 
 const asyncHandler = require('express-async-handler');
 const db = require('../db');
+
+router.get('/test1', asyncHandler(async(req, res, next) => {
+    let queryCheck = await db(`Select * from products Where sortId = 5`);
+    for (let i = 0; i < queryCheck.length; i++) {
+        let pId = queryCheck[i].id;
+        let specification = JSON.parse(queryCheck[i].specification);
+        console.log(pId);
+        // console.log(specification[0]);
+        console.log(specification[0].length);
+        if (specification[0].length > 1) {
+            let specifications = JSON.parse(specification[0].specifications);
+            console.log(specifications);
+            // console.log(specification[0].specifications);
+            await db(`Update products set specification = ? where id = ?`, [specifications, pId]);
+        }
+
+    }
+    // return res.json(queryCheck);
+}));
+
 router.get('/', asyncHandler(async(req, res, next) => {
     let { page, sortId } = req.query;
     let queryResult, queryResult2;
